@@ -6,30 +6,72 @@ date: "2023-02-07"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+#loading required packages and dataset
 library(tidyverse)
 library(haven)
 library(ggthemes)
 library(statar) 
 library(tidyquant)
+nlsy97 <- read_dta("nlsy97.dta")
+view(nlsy97)
 
 ```
 
-## R Markdown
+```{r q1a}
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+#filtering dataset by observations whose mother_education is less than or equal to 12, then calculating mean of child_college for those observations
+nlsy97_momcollege <- nlsy97 |> 
+                     filter(mother_education <= 12) 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+mean(nlsy97_momcollege$child_college, na.rm = TRUE)
+          
+```
+The proportion of children whose mothers had a high school education or less who went on to receive a college degree or higher is 18.18%.
 
-```{r cars}
-summary(cars)
+**Question 1B**
+
+My estimate is close to the Census Bureau estimate of 20.9%. There is roughly a 2.5% difference between the two estimates, which is reasonable due to the different samples used. 
+
+```{r q2}
+#2A & 2B: creating percentile ranks for kid_income and parent_inc, normalized to 100
+
+nlsy97 <- nlsy97 |> 
+          mutate(ranked_kidincome = rank(kid_income),
+                 max_rank = max(ranked_kidincome),
+                 kid_inc_rank = (ranked_kidincome/max_rank)*100,
+                 ranked_parentinc = rank(parent_inc),
+                 max_rankparent = max(ranked_parentinc),
+                 parent_inc_rank = (ranked_parentinc/max_rankparent)*100)
+              
+
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+```{r q3}
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+#3A: scatter plot of individual level data
+
+scatterrank <- nlsy97 |> 
+  ggplot() +
+  geom_point(aes(x = parent_inc_rank, y = kid_inc_rank)) +
+  geom_smooth(aes(x = parent_inc_rank, y = kid_inc_rank), method = "lm", se = F)
+scatterrank
+
+#Save graph 
+ggsave("scatterrank.png")
+
+#3B: binned scatter plot
+
+binscatter <- nlsy97 |> 
+  ggplot(aes(x = parent_inc_rank, y = kid_inc_rank)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_binmean(n = 20, geom = "line")
+binscatter
+
+#save graph
+ggsave("binscatter_connected.png")
+
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+

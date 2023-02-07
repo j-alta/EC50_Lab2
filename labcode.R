@@ -32,3 +32,26 @@ data$more_than_parents = ifelse(data$kid_income >data$parent_inc, 1, 0)
 #check the same for Black males
 #then run the linear regresison
 
+black_mean = data |> filter(black == 1 % female == 0)
+
+mod1 = lm(kid_inc_rank ~parent_inc_rank, data = black_men)
+summary(mod1(
+  
+  
+#absolute mobility = 32.95
+#q7a
+  mean(data$kid_inc_rank(data$parent_inc_rank > 20 & data$parent_inc_rank <30))
+))
+
+
+#q7b
+set.seed(12345)
+sample = sample(Data, 50, replace = TRUE)
+
+sample$rank20_30 = ifelse(sample$kid_inc_rank > 20 & sample$parent_inc_rank <30, 1, replace= TRUE))
+mod3 = lm(kidincrank ~parentincrank, data = data)
+summary(mod3)
+
+#q7c
+mean(sample_50kid_inc_rank[sample_50$parentincrank > 20 & sample_50parentincrank <30])
+
