@@ -204,9 +204,49 @@ mean(whitemen_bottom20$top20)
 white_men$morethanparents <- ifelse(white_men$kid_income > 1.4767*white_men$parent_inc, 1, 0)
 mean(white_men$morethanparents)
 
+```
+Comparing the regression-based statistics for Black men and White men, some patterns emerge. The regression slope for the Black men-only dataset is 0.29, while for White men, it is 0.266. For Black men whose parents were in the 25th income percentile, the regression predicts that they will be in 33rd percentile, while for White men, roughly the 47th percentile. Relative mobility is slightly higher for Black men, at 29.43 compared to 26.69. The probability that Black men born to parents in the bottom fifth of the income distribution will reach the top fifth is 5.7%, compared to 10.2% for white men. Finally, the fraction of children who make more in (inflation adjusted) dollars than their parents is similar between Black and White men, 48.9% and 48.2%, respectively.
+
+Taken together, there is slight evidence that mobility is higher for White men than Black men. White men are predicted to be in a higher income rank if their parents were in the 25th income percentile, and crucially, are twice as likely than Black men to make it to the top fifth of the income distribution if they were born to parents in the bottom fifth. Other indicators of mobility, such as relative mobility and fraction of children who make more in inflation adjusted dollars than their parents are more balanced. This suggests that more robust studies of upward mobility need to take other factors, such as social capital, into account.
+
+```{r q7a}
+
+#7A: Simple arithmetic mean of child income rank for those born to parents between the 20th and 30th percentile
+nlsy_7a <- nlsy97 |> 
+           filter(parent_inc_rank > 20 & parent_inc_rank < 30)
+
+mean(nlsy_7a$kid_inc_rank)
+
+```
+
+The simple mean of child income rank for those born to parents between the 20th and 30th percentile is 41.9. This is slightly higher than the regression predicted binned average, which is 40.7.
+
+
+
+```{r q7b-d}
+
+#7B: Calculating absolute mobility at the 25th percentile with linear regression for a random sample of 50
+
+set.seed(21519588)
+sample50 <- sample_n(nlsy97, 50, replace = TRUE) 
+modsample = lm(kid_inc_rank ~ parent_inc_rank, sample50)
+summary(modsample)
+
+as.numeric(modsample$coefficients)
+interceptsample <- as.numeric(modsample$coefficients)[1]
+slopesample <- as.numeric(modsample$coefficients)[2]
+
+interceptsample + 25*slopesample
+
+#7C: Mean of child income rank for parents between 20th and 30th percentile from random sample 
+
+mean(sample50$kid_inc_rank[sample50$parent_inc_rank > 20 & sample50$parent_inc_rank <30])
 
 
 ```
+
+From a random sample of 50 observations, the absolute mobility at the 25th percentile is 41.15. The simple mean of child income rank for those born to parents with income ranked between the 20th and 30th percentiles from the random sample is higher, at 47.64. The sample predicted mean using the linear regression is much closer to the full population estimate of 41.3. This is because linear regression is a better tool for providing estimated values of the relationship between two variables. 
+
 
 
 
