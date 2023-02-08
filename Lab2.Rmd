@@ -73,5 +73,147 @@ ggsave("binscatter_connected.png")
 
 
 ```
+The binned scatter plot is a far more useful summary of the data because it is cleaner to visualize and the positively correlated relationship between parent_inc_rank and kid_inc_rank is more visible. 
+
+```{r q4}
+
+#run linear regression of kid income ranks on parent income ranks
+
+mod1 = lm(kid_inc_rank ~ parent_inc_rank, data = nlsy97)
+summary(mod1)
+
+```
+In this linear regression, the intercept is 31.41, and the coefficient is 0.372. What this means is that the average parent income rank for child income ranks of 0 is 31.41, according to this regression. The coefficient tells us that for every increase of 1 parental income rank, the child income rank increases by 0.37. 
+
+```{r q5a}
+
+#Statistic 1: predicted child income rank from the rank-rank regression for parental income rank 25th percentile 
+
+as.numeric(mod1$coefficients)
+intercept <- as.numeric(mod1$coefficients)[1]
+slope <- as.numeric(mod1$coefficients)[2]
+
+intercept + 25*slope
+
+```
+The predicted child income rank for those whose parents where in the 25th percentile of income rank according to the regression is 40.73, which is not too far from the full tax data predicted rank of 41.3 
+
+```{r q5b}
+
+#Statistic 2: Relative mobility 
+100*slope
+
+```
+
+The predicted relative mobility using the linear model is 37.27, which is close to the full tax data relative mobility of 34.1
+
+```{r q5c}
+
+#Statistic 3: Probability that a child born to parents in the bottom fifth of the income distro reaches the top fifth of the income distro
+nlsy97$top20 <- ifelse(nlsy97$kid_inc_rank >= 80, 1, 0)
+nlsy97_bottom20 <- nlsy97 |> 
+                   filter(parent_inc_rank < 20)
+mean(nlsy97_bottom20$top20)
+
+
+
+```
+The probability that a child born to parents in the bottom fifth of the income distro reaches the top fifth according to the linear model is 7.37%, which is very close to the full tax data value of 7.5%.
+
+```{r q5d}
+
+#Statistic 4: Fraction of children who make more than their parents (inflation adjusted)
+
+nlsy97$morethanparents <- ifelse(nlsy97$kid_income > 1.4767*nlsy97$parent_inc, 1, 0)
+mean(nlsy97$morethanparents)
+
+
+```
+The simple linear model suggests that 50.89% of children will make more in inflation adjusted dollars than their parents, which is very close to the 50% estimate from the full tax data.
+
+```{r q6 Black men}
+
+#Black Men regression and upward mobility statistics
+#Filtering the data for Black men
+black_men <- nlsy97 |> 
+            filter(black == 1 & female == 0)
+
+#Linear regression of kid income ranks on parent income ranks for Black men
+mod1_blackmen = lm(kid_inc_rank ~ parent_inc_rank, data = black_men)
+summary(mod1_blackmen)
+
+#Upward mobility statistics for Black men
+
+#Statistic 1: predicted child income rank from the rank-rank regression for parental income rank 25th percentile 
+
+as.numeric(mod1_blackmen$coefficients)
+intercept_bm <- as.numeric(mod1_blackmen$coefficients)[1]
+slope_bm <- as.numeric(mod1_blackmen$coefficients)[2] 
+
+intercept_bm+ 25*slope_bm
+
+#Statistic 2: Relative mobility 
+100*slope_bm
+
+#Statistic 3: Probability that a child born to parents in the bottom fifth of the income distro reaches the top fifth of the income distro
+black_men$top20 <- ifelse(black_men$kid_inc_rank >= 80, 1, 0)
+blackmen_bottom20 <- black_men |> 
+                   filter(parent_inc_rank < 20)
+mean(blackmen_bottom20$top20)
+
+#Statistic 4: Fraction of children who make more than their parents (inflation adjusted)
+
+black_men$morethanparents <- ifelse(black_men$kid_income > 1.4767*black_men$parent_inc, 1, 0)
+mean(black_men$morethanparents)
+
+
+```
+
+```{r q6 White men}
+
+#White Men regression and upward mobility statistics
+#Filtering the data for White men
+white_men <- nlsy97 |> 
+            filter(white == 1 & female == 0)
+
+#Linear regression of kid income ranks on parent income ranks for Black men
+mod1_whitemen = lm(kid_inc_rank ~ parent_inc_rank, data = white_men)
+summary(mod1_whitemen)
+
+#Upward mobility statistics for White men
+
+#Statistic 1: predicted child income rank from the rank-rank regression for parental income rank 25th percentile 
+
+as.numeric(mod1_whitemen$coefficients)
+intercept_wm <- as.numeric(mod1_whitemen$coefficients)[1]
+slope_wm <- as.numeric(mod1_whitemen$coefficients)[2] 
+
+intercept_wm+ 25*slope_wm
+
+#Statistic 2: Relative mobility 
+100*slope_wm
+
+#Statistic 3: Probability that a child born to parents in the bottom fifth of the income distro reaches the top fifth of the income distro
+white_men$top20 <- ifelse(white_men$kid_inc_rank >= 80, 1, 0)
+whitemen_bottom20 <- white_men |> 
+                   filter(parent_inc_rank < 20)
+mean(whitemen_bottom20$top20)
+
+#Statistic 4: Fraction of children who make more than their parents (inflation adjusted)
+
+white_men$morethanparents <- ifelse(white_men$kid_income > 1.4767*white_men$parent_inc, 1, 0)
+mean(white_men$morethanparents)
+
+
+
+```
+
+
+
+
+
+
+
+
 
 
